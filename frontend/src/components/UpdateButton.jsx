@@ -3,7 +3,7 @@ import { uploadAndGetData, getGPTAnalysis, analyzeExcelFile } from '../services/
 import { useData } from '../contexts/DataContext';
 import ReactMarkdown from 'react-markdown';
 
-const UpdateButton = () => {
+const UpdateButton = ({ onDataUpdated }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [isDiagnosing, setIsDiagnosing] = useState(false);
@@ -151,6 +151,11 @@ const UpdateButton = () => {
             } else {
                 // Skip GPT analysis
                 console.log("Skipping GPT analysis to avoid API issues");
+            }
+            
+            // Call the onDataUpdated callback if provided
+            if (onDataUpdated && typeof onDataUpdated === 'function') {
+                onDataUpdated();
             }
         } catch (err) {
             setError(err.message || 'Failed to update data');

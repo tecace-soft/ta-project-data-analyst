@@ -46,8 +46,12 @@ const ProjectCharts = () => {
         
         data.forEach(project => {
             const projectCode = project['Project Code'];
-            if (!seen.has(projectCode)) {
+            if (projectCode && !seen.has(projectCode)) {
                 seen.add(projectCode);
+                uniqueData.push(project);
+            } else if (!projectCode) {
+                // Handle projects without a Project Code by including them
+                console.log("Project without Project Code found, including in calculation");
                 uniqueData.push(project);
             }
         });
@@ -319,48 +323,37 @@ const ProjectCharts = () => {
     
     // Helper function to calculate quarterly data from actual project data
     const calculateQuarterlyData = useCallback(() => {
-        if (!data || data.length === 0) return;
+        // Instead of recalculating from raw data, use the already calculated monthly data
+        // This ensures consistency with the monthly calculation (including any overrides)
+        if (!monthlyData.monthlyRevenue || monthlyData.monthlyRevenue.length === 0) {
+            console.log("Monthly data not available yet, skipping quarterly calculation");
+            return;
+        }
         
-        // Months in order
-        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        console.log(`========= QUARTERLY CALCULATION USING MONTHLY DATA =========`);
+        console.log(`Using already calculated monthly revenue:`, monthlyData.monthlyRevenue);
         
-        // Initialize monthly totals
-        const monthlyTotals = {};
-        months.forEach(month => {
-            monthlyTotals[month] = 0;
-        });
-        
-        // SIMPLE DIRECT CALCULATION
-        // Go through each project and add up the exact month fields
-        data.forEach(project => {
-            // Process each month
-            months.forEach(month => {
-                // The EXACT field we're looking for: e.g. "2025 Jan"
-                const exactFieldName = `${selectedYearQuarterly} ${month}`;
-                
-                // Check if this project has the field
-                if (exactFieldName in project) {
-                    const value = project[exactFieldName];
-                    
-                    // Only add numeric values
-                    if (typeof value === 'number') {
-                        monthlyTotals[month] += value;
-                    }
-                }
-            });
-        });
+        // Use the monthly revenue data that was already calculated and deduplicated
+        const [jan, feb, mar, apr, may, jun, jul, aug, sep, oct, nov, dec] = monthlyData.monthlyRevenue;
         
         // Calculate quarterly totals using the monthly data
         const quarterlyRevenue = [
             // Q1: Jan + Feb + Mar
-            monthlyTotals['Jan'] + monthlyTotals['Feb'] + monthlyTotals['Mar'],
+            jan + feb + mar,
             // Q2: Apr + May + Jun
-            monthlyTotals['Apr'] + monthlyTotals['May'] + monthlyTotals['Jun'],
+            apr + may + jun,
             // Q3: Jul + Aug + Sep
-            monthlyTotals['Jul'] + monthlyTotals['Aug'] + monthlyTotals['Sep'],
+            jul + aug + sep,
             // Q4: Oct + Nov + Dec
-            monthlyTotals['Oct'] + monthlyTotals['Nov'] + monthlyTotals['Dec']
+            oct + nov + dec
         ];
+        
+        // Log the quarterly calculations for debugging
+        console.log(`\nQUARTERLY CALCULATION RESULTS FOR ${selectedYearQuarterly}:`);
+        console.log(`Q1 (Jan+Feb+Mar): ${jan} + ${feb} + ${mar} = ${quarterlyRevenue[0]}`);
+        console.log(`Q2 (Apr+May+Jun): ${apr} + ${may} + ${jun} = ${quarterlyRevenue[1]}`);
+        console.log(`Q3 (Jul+Aug+Sep): ${jul} + ${aug} + ${sep} = ${quarterlyRevenue[2]}`);
+        console.log(`Q4 (Oct+Nov+Dec): ${oct} + ${nov} + ${dec} = ${quarterlyRevenue[3]}`);
         
         // Calculate cumulative revenue
         const cumulativeRevenue = [];
@@ -370,9 +363,13 @@ const ProjectCharts = () => {
             cumulativeRevenue.push(runningTotal);
         });
         
+        console.log(`Quarterly revenue array:`, quarterlyRevenue);
+        console.log(`Cumulative revenue array:`, cumulativeRevenue);
+        console.log(`===== END QUARTERLY CALCULATION =====`);
+        
         // Update the state with calculated values
         setQuarterlyData({ quarterlyRevenue, cumulativeRevenue });
-    }, [data, selectedYearQuarterly]);
+    }, [monthlyData, selectedYearQuarterly]);
     
     useEffect(() => {
         calculateMonthlyData();
@@ -384,7 +381,7 @@ const ProjectCharts = () => {
     
     useEffect(() => {
         calculateQuarterlyData();
-    }, [data, selectedYearQuarterly, calculateQuarterlyData]);
+    }, [monthlyData, selectedYearQuarterly, calculateQuarterlyData]);
     
     if (!data || data.length === 0) {
         return (
