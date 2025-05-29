@@ -32,4 +32,11 @@ def create_app():
 
 if __name__ == '__main__':
     app = create_app()
-    app.run(debug=True, port=5000) 
+    
+    # Get port from environment (for Render), fallback to 5000 for local dev
+    port = int(os.environ.get("PORT", 5000))
+    
+    # Get host from environment or use localhost for local dev
+    host = os.environ.get("HOST", "127.0.0.1")
+    
+    app.run(host=host, port=port, debug=True)
