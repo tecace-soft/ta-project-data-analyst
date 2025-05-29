@@ -6,7 +6,7 @@ import logging
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(project_root)
 
-from flask import Flask
+from flask import Flask, send_from_directory, send_file
 from flask_cors import CORS
 from backend.routes.data import data_bp
 from backend.routes.analysis import analysis_bp
@@ -16,24 +16,65 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 def create_app():
-    app = Flask(__name__)
+    # Configure Flask to serve static files from React build directory
+    static_folder = os.path.join(project_root, 'build', 'static')
+    template_folder = os.path.join(project_root, 'build')
+    
+    app = Flask(__name__, 
+                static_folder=static_folder,
+                template_folder=template_folder)
     
     # Configure CORS
-    CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
+    CORS(app, resources={r"/api/*": {"origins": "*"}})  # Allow all origins for deployment
     
     # Configure file upload settings
     app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
     
-    # Register blueprints
+    # Register API blueprints
     app.register_blueprint(data_bp)
     app.register_blueprint(analysis_bp)
+    
+    # Frontend routes for serving React app
+    @app.route('/static/<path:path>')
+    def serve_static(path):
+        """Serve static files from React build"""
+        static_dir = os.path.join(project_root, 'build', 'static')
+        return send_from_directory(static_dir, path)
+    
+    @app.route('/favicon.ico')
+    def serve_favicon():
+        """Serve favicon from React build"""
+        build_dir = os.path.join(project_root, 'build')
+        return send_from_directory(build_dir, 'favicon.ico')
+    
+    @app.route('/')
+    @app.route('/<path:path>')
+    def serve_frontend(path=''):
+        """Serve React app for all non-API routes"""
+        # Check if it's an API route
+        if path.startswith('api/'):
+            return {'error': 'API endpoint not found'}, 404
+        
+        # Serve the React app's index.html for all other routes
+        build_dir = os.path.join(project_root, 'build')
+        index_path = os.path.join(build_dir, 'index.html')
+        
+        if os.path.exists(index_path):
+            return send_file(index_path)
+        else:
+            # If build doesn't exist, show helpful message
+            return '''
+            <h1>Frontend not built</h1>
+            <p>Please run <code>npm run build</code> from the project root to build the React frontend.</p>
+            <p>Then restart the Flask server.</p>
+            ''', 404
     
     return app
 
 if __name__ == '__main__':
     app = create_app()
     
-    # Get port from environment (for Render), fallback to 5000 for local dev
+    # Get port from environment (for deployment), fallback to 5000 for local dev
     port = int(os.environ.get("PORT", 5000))
     
     # Get host from environment or use localhost for local dev
