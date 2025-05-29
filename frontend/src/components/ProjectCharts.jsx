@@ -638,7 +638,16 @@ const ProjectCharts = () => {
                             barmode: 'group',
                             bargap: 0.15,
                             bargroupgap: 0.1,
-                            legend: { x: 0.1, y: 1.2 },
+                            legend: { 
+                                x: 0.02, 
+                                y: 0.98, 
+                                xanchor: 'left', 
+                                yanchor: 'top',
+                                bgcolor: 'rgba(255,255,255,0.8)',
+                                bordercolor: 'rgba(0,0,0,0.1)',
+                                borderwidth: 1
+                            },
+                            width: 1300,
                             height: 500
                         }}
                     />
@@ -692,7 +701,16 @@ const ProjectCharts = () => {
                                 overlaying: 'y',
                                 side: 'right'
                             },
-                            legend: { x: 0.1, y: 1.2 },
+                            legend: { 
+                                x: 0.02, 
+                                y: 0.98, 
+                                xanchor: 'left', 
+                                yanchor: 'top',
+                                bgcolor: 'rgba(255,255,255,0.8)',
+                                bordercolor: 'rgba(0,0,0,0.1)',
+                                borderwidth: 1
+                            },
+                            width: 1300,
                             height: 500
                         }}
                     />
@@ -708,6 +726,13 @@ const ProjectCharts = () => {
                                 name: 'Expected Revenue',
                                 x: months,
                                 y: expectedMonthlyRevenue,
+                                text: expectedMonthlyRevenue.map(val => val ? `$${val.toLocaleString()}` : '$0'),
+                                textposition: 'outside',
+                                textfont: {
+                                    size: 14,
+                                    color: '#2D3748',
+                                    family: 'Arial, sans-serif'
+                                },
                                 marker: { color: '#4299e1' }
                             },
                             {
@@ -715,17 +740,49 @@ const ProjectCharts = () => {
                                 name: 'Actualized Revenue',
                                 x: months,
                                 y: actualizedMonthlyRevenue,
+                                text: actualizedMonthlyRevenue.map(val => val ? `$${val.toLocaleString()}` : '$0'),
+                                textposition: 'outside',
+                                textfont: {
+                                    size: 14,
+                                    color: '#2D3748',
+                                    family: 'Arial, sans-serif'
+                                },
                                 marker: { color: '#f6ad55' }
                             }
                         ]}
                         layout={{
                             title: '2025 Monthly Expected vs Actualized Revenue',
-                            xaxis: { title: 'Month' },
-                            yaxis: { title: 'Amount' },
+                            xaxis: { 
+                                title: 'Month',
+                                tickangle: -45
+                            },
+                            yaxis: { 
+                                title: 'Amount',
+                                tickformat: ',.0f'
+                            },
                             barmode: 'group',
-                            bargap: 0.15,
-                            bargroupgap: 0.1,
-                            height: 500
+                            bargap: 0.02,
+                            bargroupgap: 0.02,
+                            legend: { 
+                                x: 0.02, 
+                                y: 0.98, 
+                                xanchor: 'left', 
+                                yanchor: 'top',
+                                bgcolor: 'rgba(255,255,255,0.8)',
+                                bordercolor: 'rgba(0,0,0,0.1)',
+                                borderwidth: 1
+                            },
+                            width: 1300,
+                            height: 600,
+                            margin: {
+                                t: 100,
+                                b: 80,
+                                l: 80,
+                                r: 40
+                            },
+                            font: {
+                                size: 12
+                            }
                         }}
                     />
                 </div>
@@ -744,6 +801,7 @@ const ProjectCharts = () => {
                         ]}
                         layout={{
                             title: 'Project Status Distribution',
+                            width: 1300,
                             height: 500
                         }}
                     />
