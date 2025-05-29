@@ -17,8 +17,9 @@ logger = logging.getLogger(__name__)
 
 def create_app():
     # Configure Flask to serve static files from React build directory
-    static_folder = os.path.join(project_root, 'build', 'static')
-    template_folder = os.path.join(project_root, 'build')
+    frontend_build_path = os.path.join(project_root, 'frontend', 'build')
+    static_folder = os.path.join(frontend_build_path, 'static')
+    template_folder = frontend_build_path
     
     app = Flask(__name__, 
                 static_folder=static_folder,
