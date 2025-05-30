@@ -27,7 +27,8 @@ cd ta-project-data-analyst
 
 ### 2. Frontend Setup
 ```bash
-# Install frontend dependencies
+# Navigate to frontend directory and install dependencies
+cd frontend
 npm install
 ```
 
@@ -72,7 +73,8 @@ The backend will start on `http://localhost:5000`
 
 #### Terminal 2 - Frontend Development Server:
 ```bash
-# From root directory
+# Navigate to frontend directory
+cd frontend
 npm start
 ```
 The frontend will start on `http://localhost:3000`
@@ -81,7 +83,8 @@ The frontend will start on `http://localhost:3000`
 
 #### Build Frontend:
 ```bash
-# From root directory
+# Navigate to frontend directory and build
+cd frontend
 npm run build
 ```
 
@@ -89,6 +92,31 @@ npm run build
 ```bash
 # Start backend (serves both API and built frontend)
 cd backend
+python app.py
+```
+
+### 🚀 **Development Mode (Two terminals):**
+
+**Terminal 1 - Backend:**
+```bash
+cd backend
+python app.py
+```
+
+**Terminal 2 - Frontend:**
+```bash
+cd frontend
+npm start
+```
+
+### 🏗️ **Production Build:**
+```bash
+# Build frontend
+cd frontend
+npm run build
+
+# Serve built app
+cd ../backend
 python app.py
 ```
 
@@ -172,8 +200,9 @@ Your Excel file should contain:
 
 ## 🔍 Available Scripts
 
-### Frontend Scripts (from root directory):
+### Frontend Scripts (from frontend directory):
 ```bash
+cd frontend
 npm start          # Start development server
 npm run build      # Build for production
 npm test           # Run tests
@@ -233,3 +262,16 @@ For issues and questions:
 ---
 
 **Happy Analyzing!** 📊✨ 
+
+### 🔧 **Initial Setup (One-time):**
+```bash
+# Install frontend dependencies
+cd frontend
+npm install
+
+# Setup backend
+cd ../backend
+python -m venv venv
+venv\Scripts\activate  # Windows
+pip install -r requirements.txt
+``` 
