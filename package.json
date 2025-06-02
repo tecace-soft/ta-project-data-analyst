@@ -4,8 +4,8 @@
   "description": "Technical Analysis Data Visualization App",
   "scripts": {
     "install-frontend": "cd frontend && npm install",
-    "build": "cd frontend && npm run build && mv build ../",
-    "start": "cd frontend && npm start",
+    "build": "cd frontend && NODE_OPTIONS=--max-old-space-size=4096 GENERATE_SOURCEMAP=false npm run build",
+    "start": "cd frontend && npm run start:prod",
     "postinstall": "npm run install-frontend"
   },
   "repository": {

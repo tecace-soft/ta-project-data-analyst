@@ -12,8 +12,18 @@ logger = logging.getLogger(__name__)
 
 # Get the API key
 api_key = os.getenv('OPENAI_API_KEY')
+logger.debug(f"OpenAI API key loaded: {'Yes' if api_key else 'No'}")
+logger.debug(f"API key length: {len(api_key) if api_key else 0}")
+logger.debug(f"API key starts with: {api_key[:10] + '...' if api_key and len(api_key) > 10 else 'N/A'}")
+
 if not api_key:
     logger.warning("No OpenAI API key found! Analysis functionality will be limited to a fallback response.")
+    logger.debug("Environment variables available:")
+    for key, value in os.environ.items():
+        if 'OPENAI' in key.upper() or 'API' in key.upper():
+            logger.debug(f"  {key}: {'Set' if value else 'Empty'}")
+else:
+    logger.info("OpenAI API key successfully loaded from environment")
 
 analysis_bp = Blueprint('analysis', __name__)
 
@@ -59,12 +69,32 @@ def analyze_data():
         
         # Initialize OpenAI client if we have an API key
         try:
+            import openai
+            logger.debug(f"OpenAI library version: {openai.__version__}")
+            
             from openai import OpenAI
+            logger.debug("OpenAI class imported successfully")
+            
+            # Initialize with minimal parameters
             client = OpenAI(api_key=api_key)
-        except Exception as e:
-            logger.error(f"Error initializing OpenAI client: {str(e)}")
+            logger.debug("OpenAI client initialized successfully")
+        except ImportError as import_err:
+            logger.error(f"Error importing OpenAI library: {str(import_err)}")
             analysis = generate_fallback_analysis(data)
             return jsonify(analysis)
+        except Exception as e:
+            logger.error(f"Error initializing OpenAI client: {str(e)}")
+            logger.error(f"OpenAI library version issue - falling back to basic analysis")
+            # Try alternative initialization
+            try:
+                logger.debug("Attempting alternative OpenAI client initialization...")
+                import openai as openai_module
+                client = openai_module.OpenAI(api_key=api_key)
+                logger.debug("Alternative OpenAI client initialization successful")
+            except Exception as alt_error:
+                logger.error(f"Alternative initialization also failed: {str(alt_error)}")
+                analysis = generate_fallback_analysis(data)
+                return jsonify(analysis)
             
         # Format the data for the GPT prompt
         prompt = create_analysis_prompt(data)
