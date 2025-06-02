@@ -75,7 +75,7 @@ def analyze_data():
             from openai import OpenAI
             logger.debug("OpenAI class imported successfully")
             
-            # Initialize with minimal parameters
+            # Simple initialization - the newer library version should handle this correctly
             client = OpenAI(api_key=api_key)
             logger.debug("OpenAI client initialized successfully")
         except ImportError as import_err:
@@ -84,18 +84,10 @@ def analyze_data():
             return jsonify(analysis)
         except Exception as e:
             logger.error(f"Error initializing OpenAI client: {str(e)}")
-            logger.error(f"OpenAI library version issue - falling back to basic analysis")
-            # Try alternative initialization
-            try:
-                logger.debug("Attempting alternative OpenAI client initialization...")
-                import openai as openai_module
-                client = openai_module.OpenAI(api_key=api_key)
-                logger.debug("Alternative OpenAI client initialization successful")
-            except Exception as alt_error:
-                logger.error(f"Alternative initialization also failed: {str(alt_error)}")
-                analysis = generate_fallback_analysis(data)
-                return jsonify(analysis)
-            
+            logger.error(f"Error type: {type(e).__name__}")
+            analysis = generate_fallback_analysis(data)
+            return jsonify(analysis)
+        
         # Format the data for the GPT prompt
         prompt = create_analysis_prompt(data)
         
