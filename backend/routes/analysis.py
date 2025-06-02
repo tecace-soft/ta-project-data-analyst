@@ -95,7 +95,7 @@ def analyze_data():
         logger.debug("Calling OpenAI API")
         try:
             response = client.chat.completions.create(
-                model="gpt-4o",
+                model="gpt-4o-mini",
                 messages=[
                     {"role": "system", "content": "You are an expert business analyst specializing in tech project portfolio analysis. You have extensive experience in identifying trends, risks, and opportunities in project data. Your analyses are data-driven, insightful, and strategically oriented. You present information in a clear, well-structured format with actionable recommendations tailored to executive leadership. Use markdown formatting for better readability, and focus on extracting meaningful insights rather than just summarizing the data."},
                     {"role": "user", "content": prompt}

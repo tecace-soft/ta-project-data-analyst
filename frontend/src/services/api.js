@@ -109,7 +109,8 @@ export const getGPTAnalysis = async (data) => {
             throw new Error(error.error || 'Failed to get GPT analysis');
         }
 
-        const result = await response.text();
+        const result = await response.json();
+        console.log("Analysis result received:", result);
         return result;
     } catch (error) {
         console.error('Error getting GPT analysis:', error);
