@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:5000';
+// Use environment variable for API base URL, fallback to production backend for universal access
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'https://ta-project-data-analyst-backend.onrender.com';
 
 export const fetchProjectData = async () => {
     try {
@@ -95,43 +96,23 @@ export const uploadAndGetData = async (file) => {
 
 export const getGPTAnalysis = async (data) => {
     try {
-        // If data is in the new format with projects and invoices, send only the projects
-        const projectData = Array.isArray(data) ? data : (data.projects || []);
-        
-        const response = await axios.post(`${API_BASE_URL}/api/analyze`, {
-            data: projectData
-        });
-        return response.data;
-    } catch (error) {
-        console.error('Error getting GPT analysis:', error);
-        if (error.response) {
-            throw new Error(error.response.data.message || 'Failed to get GPT analysis');
-        } else if (error.request) {
-            throw new Error('No response from server. Please check if the backend is running.');
-        } else {
-            throw new Error('Error setting up the GPT analysis request');
-        }
-    }
-};
-
-export const analyzeExcelFile = async (file) => {
-    try {
-        const formData = new FormData();
-        formData.append('file', file);
-
-        const response = await fetch(`${API_BASE_URL}/api/excel-diagnostic`, {
+        const response = await fetch(`${API_BASE_URL}/api/analyze`, {
             method: 'POST',
-            body: formData
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ data })
         });
 
         if (!response.ok) {
             const error = await response.json();
-            throw new Error(error.error || 'Failed to analyze Excel file');
+            throw new Error(error.error || 'Failed to get GPT analysis');
         }
 
-        return await response.json();
+        const result = await response.text();
+        return result;
     } catch (error) {
-        console.error('Error analyzing Excel file:', error);
+        console.error('Error getting GPT analysis:', error);
         throw error;
     }
 }; 
