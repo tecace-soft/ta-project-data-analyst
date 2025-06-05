@@ -242,7 +242,18 @@ function createMonthlyRevenueChart(revenueData, year) {
             color: '#667eea',
             line: { color: '#5a6fd8', width: 1 }
         },
-        name: `${year} Monthly Revenue`
+        name: `${year} Monthly Revenue`,
+        text: revenues.map(val => {
+            if (val >= 1000000) return (val / 1000000).toFixed(2) + 'M';
+            if (val >= 1000) return Math.round(val / 1000) + 'K';
+            return Math.round(val).toString();
+        }),
+        textposition: 'inside',
+        textfont: {
+            size: 18,
+            color: '#333'
+        },
+        textangle: -90
     };
     
     const layout = {
@@ -255,7 +266,7 @@ function createMonthlyRevenueChart(revenueData, year) {
             title: 'Revenue ($)',
             tickformat: ',.0f'
         },
-        margin: { l: 80, r: 40, t: 60, b: 50 }
+        margin: { l: 80, r: 40, t: 120, b: 50 }
     };
     
     Plotly.newPlot('monthly-revenue-chart', [trace], layout, {responsive: true});
@@ -282,7 +293,13 @@ function createQuarterlyRevenueChart(revenueData, year) {
             color: '#28a745',
             line: { color: '#1e7e34', width: 1 }
         },
-        name: `${year} Quarterly Revenue`
+        name: `${year} Quarterly Revenue`,
+        text: quarterlyTotals.map(val => Math.round(val).toLocaleString()),
+        textposition: 'outside',
+        textfont: {
+            size: 12,
+            color: '#333'
+        }
     };
     
     const layout = {
@@ -318,7 +335,18 @@ function createExpectedVsActualChart(revenueData, invoiceData) {
         y: expectedRevenues,
         type: 'bar',
         name: 'Expected Revenue',
-        marker: { color: '#667eea' }
+        marker: { color: '#667eea' },
+        text: expectedRevenues.map(val => {
+            if (val >= 1000000) return (val / 1000000).toFixed(2) + 'M';
+            if (val >= 1000) return Math.round(val / 1000) + 'K';
+            return Math.round(val).toString();
+        }),
+        textposition: 'inside',
+        textfont: {
+            size: 18,
+            color: '#333'
+        },
+        textangle: -90
     };
     
     const trace2 = {
@@ -326,7 +354,18 @@ function createExpectedVsActualChart(revenueData, invoiceData) {
         y: actualRevenues,
         type: 'bar',
         name: 'Actual Invoices',
-        marker: { color: '#fd7e14' }
+        marker: { color: '#fd7e14' },
+        text: actualRevenues.map(val => {
+            if (val >= 1000000) return (val / 1000000).toFixed(2) + 'M';
+            if (val >= 1000) return Math.round(val / 1000) + 'K';
+            return Math.round(val).toString();
+        }),
+        textposition: 'inside',
+        textfont: {
+            size: 18,
+            color: '#333'
+        },
+        textangle: -90
     };
     
     const layout = {
@@ -340,7 +379,14 @@ function createExpectedVsActualChart(revenueData, invoiceData) {
             tickformat: ',.0f'
         },
         barmode: 'group',
-        margin: { l: 80, r: 40, t: 60, b: 50 }
+        margin: { l: 80, r: 40, t: 150, b: 50 },
+        legend: {
+            orientation: 'h',
+            x: 0.5,
+            xanchor: 'center',
+            y: 1.05,
+            yanchor: 'bottom'
+        }
     };
     
     Plotly.newPlot('expected-vs-actual-chart', [trace1, trace2], layout, {responsive: true});
@@ -689,4 +735,4 @@ chatInput.addEventListener('keydown', (e) => {
 
 chatInput.addEventListener('input', autoResizeTextarea);
 
-floatingChatBtn.addEventListener('click', showChatWindow); 
+floatingChatBtn.addEventListener('click', showChatWindow);
