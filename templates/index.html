@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TecAce Project Data Analyst</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>TecAce Project Data Analyst</h1>
+        
+        <div class="upload-section">
+            <div class="file-input-container">
+                <input type="file" id="file-input" class="file-input" accept=".xlsx,.xls,.xlsm">
+                <label for="file-input" class="file-input-label" id="file-label">
+                    <div>
+                        <h3>📁 Choose Excel File</h3>
+                        <p>Drag and drop your Excel file here or click to browse</p>
+                        <small>Supports .xlsx, .xls, and .xlsm files</small>
+                    </div>
+                </label>
+            </div>
+            
+            <div class="file-info" id="file-info">
+                <strong>Selected file:</strong> <span id="file-name"></span><br>
+                <strong>Size:</strong> <span id="file-size"></span>
+            </div>
+            
+            <div class="progress-bar" id="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            
+            <div class="button-group">
+                <button id="parse-btn" class="btn btn-secondary" disabled>Parse Data</button>
+            </div>
+        </div>
+        
+        <div class="message" id="message"></div>
+        
+        <div class="charts-section" id="charts-section" style="display: none;">
+            <h2>📊 Data Visualizations</h2>
+            <div class="charts-grid">
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <label for="monthly-year-selector">Year:</label>
+                        <select id="monthly-year-selector" class="year-selector">
+                            <option value="2024">2024</option>
+                            <option value="2025">2025</option>
+                        </select>
+                    </div>
+                    <div id="monthly-revenue-chart"></div>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <label for="quarterly-year-selector">Year:</label>
+                        <select id="quarterly-year-selector" class="year-selector">
+                            <option value="2024">2024</option>
+                            <option value="2025">2025</option>
+                        </select>
+                    </div>
+                    <div id="quarterly-revenue-chart"></div>
+                </div>
+                <div class="chart-container">
+                    <div id="expected-vs-actual-chart"></div>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <label for="year-selector">Year:</label>
+                        <select id="year-selector" class="year-selector">
+                            <option value="all">All Years</option>
+                        </select>
+                    </div>
+                    <div id="project-status-chart"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="loading" id="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p>Processing...</p>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html> 
