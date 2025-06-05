@@ -376,18 +376,26 @@ Please provide a comprehensive business analysis focusing on the following areas
    - Identify monthly and quarterly revenue patterns and potential gaps
    - Highlight high-revenue months and low-revenue months
    - Analyze seasonality and trending patterns in the data
+   - Make comparisons to previous years, months, and quarters by referencing past year monthly revenue totals in MONTHLY REVENUE TOTAL DATA section
  
 3. STRATEGIC RECOMMENDATIONS
    - Provide 3-5 actionable recommendations based on the monthly revenue patterns
    - Suggest optimization strategies for low-revenue periods
+   - Make strategic recommendations based on current AI news and trends (reference any sources you find)
+   - Make strategic recommendations based on news of TecAce clients Samsung and SK Telecom (reference any sources you find)
    - Recommend focus areas for improving overall revenue performance
+
+5. PROBABILITY OF ACHIEVING REVENUE GOALS
+   - Based on current year project data and possibility % values, provide insights on projected performance
+   - Identify potential risks to revenue targets
+   - Suggest strategies to maximize revenue in upcoming months
  
-4. REVENUE FORECASTING
+6. REVENUE FORECASTING
    - Based on current year data, provide insights on projected performance
    - Identify potential risks to revenue targets
    - Suggest strategies to maximize revenue in upcoming months
  
-5. RISK ASSESSMENT
+7. RISK ASSESSMENT
    - Identify potential red flags or concerning patterns in the revenue data
    - Suggest mitigation strategies for identified risks
    - Highlight months or quarters that require special attention
