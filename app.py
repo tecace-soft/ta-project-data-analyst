@@ -350,76 +350,146 @@ def generate_project_insights(current_year_projects, current_year, rev_totals):
             elif hasattr(obj, 'isoformat'):  # pandas Timestamp
                 return obj.isoformat()
             raise TypeError(f"Object of type {type(obj)} is not JSON serializable")
-        
+
         prompt = f"""
-I have project data for {project_count} tech projects from {current_year} that I need you to analyze for business insights.
- 
-KEY METRICS SUMMARY:
-- Total {current_year} projects: {project_count}
-- Total {current_year} revenue: ${total_revenue:,.2f}
-- Average revenue per {current_year} project: ${avg_revenue:,.2f}
- 
-FULL PROJECT DATA:
-{json.dumps(sample_projects, indent=2, default=datetime_handler)}
+            ⚠️ 모든 분석 결과는 반드시 **한국어**로 작성해주세요. 영어는 숫자, 고유명사(회사명 등)에만 사용 가능합니다.
 
-MONTHLY REVENUE TOTAL DATA:
-{json.dumps(rev_totals, indent=2)} 
- 
-Please provide a comprehensive business analysis focusing on the following areas:
- 
-1. EXECUTIVE SUMMARY
-   - Overview of the current year's project portfolio's current state
-   - Key performance indicators and headline metrics
-   - High-level observations and critical insights
- 
-2. TREND ANALYSIS
-   - Identify monthly and quarterly revenue patterns and potential gaps
-   - Highlight high-revenue months and low-revenue months
-   - Analyze seasonality and trending patterns in the data
-   - Make comparisons to previous years, months, and quarters by referencing past year monthly revenue totals in MONTHLY REVENUE TOTAL DATA section
- 
-3. STRATEGIC RECOMMENDATIONS
-   - Provide 3-5 actionable recommendations based on the monthly revenue patterns
-   - Suggest optimization strategies for low-revenue periods
-   - Make strategic recommendations based on current AI news and trends (reference any sources you find)
-   - Make strategic recommendations based on news of TecAce clients Samsung and SK Telecom (reference any sources you find)
-   - Recommend focus areas for improving overall revenue performance
+            {current_year}년의 {project_count}개 기술 프로젝트 데이터를 비즈니스 인사이트 관점에서 분석해주세요.
 
-5. PROBABILITY OF ACHIEVING REVENUE GOALS
-   - Based on current year project data and possibility % values, provide insights on projected performance
-   - Identify potential risks to revenue targets
-   - Suggest strategies to maximize revenue in upcoming months
- 
-6. REVENUE FORECASTING
-   - Based on current year data, provide insights on projected performance
-   - Identify potential risks to revenue targets
-   - Suggest strategies to maximize revenue in upcoming months
- 
-7. RISK ASSESSMENT
-   - Identify potential red flags or concerning patterns in the revenue data
-   - Suggest mitigation strategies for identified risks
-   - Highlight months or quarters that require special attention
- 
-IMPORTANT: Format your response using proper markdown syntax:
-- Use # ## ### for headings (e.g., # EXECUTIVE SUMMARY, ## Key Findings)
-- Use **bold** for emphasis and important points
-- Use *italic* for subtle emphasis
-- Use bullet points with - or * for lists
-- Use numbered lists (1. 2. 3.) for sequential recommendations
-- Use emojis strategically to highlight key sections (📊 📈 📉 ⚠️ 💡 🎯)
-- Ensure proper spacing between sections for readability
+            🔹 핵심 지표 요약 (KEY METRICS SUMMARY):
+            - 총 프로젝트 수: {project_count}
+            - 총 수익: ${total_revenue:,.2f}
+            - 프로젝트당 평균 수익: ${avg_revenue:,.2f}
 
-The analysis should be comprehensive but concise, focusing on actionable insights rather than restating the data.
-"""
+            🔹 전체 프로젝트 데이터 (FULL PROJECT DATA):
+            {json.dumps(sample_projects, indent=2, default=datetime_handler)}
+
+            🔹 월별 수익 총합 데이터 (MONTHLY REVENUE TOTAL DATA):
+            {json.dumps(rev_totals, indent=2)} 
+
+            📌 다음 영역에 대해 종합적인 비즈니스 분석을 작성해주세요:
+
+            1. # 경영 요약
+            - 올해 프로젝트 포트폴리오 개요
+            - 주요 성과 지표 및 핵심 수치 요약
+            - 주요 인사이트 및 의미 있는 관찰 결과
+
+            2. # 트렌드 분석
+            - 월별 및 분기별 수익 패턴 및 차이 분석
+            - 수익이 높은 시기와 낮은 시기 구분
+            - 계절성 및 반복되는 경향 파악
+            - 과거 데이터와의 비교 포함
+
+            3. # 전략적 제언
+            - 수익 패턴 기반 3~5개의 실행 가능한 전략 제안
+            - 수익이 낮은 시기의 개선 전략 제시
+            - AI 관련 최근 뉴스 및 트렌드를 반영한 제안 포함 (가능한 경우 출처 제시)
+            - TecAce 고객사인 Samsung 및 SKT 관련 최근 뉴스 기반 전략 제안 (가능한 경우 출처 제시)
+            - 전체 수익 개선을 위한 우선순위 영역 제안
+
+            4. # 수익 목표 달성 확률 분석
+            - 현재 프로젝트 데이터를 바탕으로 수익 달성 가능성 분석
+            - 주요 리스크 요소 식별
+            - 향후 수익 극대화를 위한 전략 제안
+
+            5. # 수익 예측
+            - 데이터 기반 향후 실적 예측
+            - 수익 타깃에 대한 리스크 요인 파악
+            - 대응 전략 제안
+
+            6. # 리스크 평가
+            - 수익 데이터 내 우려되는 패턴 및 경고 지점 파악
+            - 리스크 대응 방안 제안
+            - 집중 관리가 필요한 월 또는 분기 강조
+
+            📝 보고서 형식:
+            - # ## ### 제목 구분 사용
+            - **굵은 글씨**로 핵심 강조
+            - *기울임체*는 미묘한 강조에 사용
+            - - 또는 * 로 목록 작성
+            - 1. 2. 3. 순서 있는 목록 작성
+            - 📊 📈 📉 ⚠️ 💡 🎯 이모지를 전략적으로 사용
+            - 각 섹션 간에 충분한 여백을 두어 가독성 확보
+
+            ✳️ **다시 한번 강조합니다: 모든 응답은 반드시 한국어로 작성해 주세요.**
+                        🚨 **중요 알림**: 
+            - 영어 단어나 문장은 절대 사용하지 마세요
+            - 모든 제목, 분석, 설명은 한국어로만 작성
+            - 회사명(Samsung, SKT 등)과 숫자만 원래 형태 유지
+            - 한국 비즈니스 용어와 표현 사용 필수
+            
+            🇰🇷 **응답 언어: 한국어 100% 필수**
+            """
+
+#         prompt = f"""
+# I have project data for {project_count} tech projects from {current_year} that I need you to analyze for business insights.
+ 
+# KEY METRICS SUMMARY:
+# - Total {current_year} projects: {project_count}
+# - Total {current_year} revenue: ${total_revenue:,.2f}
+# - Average revenue per {current_year} project: ${avg_revenue:,.2f}
+ 
+# FULL PROJECT DATA:
+# {json.dumps(sample_projects, indent=2, default=datetime_handler)}
+
+# MONTHLY REVENUE TOTAL DATA:
+# {json.dumps(rev_totals, indent=2)} 
+ 
+# Please provide a comprehensive business analysis focusing on the following areas:
+ 
+# 1. EXECUTIVE SUMMARY
+#    - Overview of the current year's project portfolio's current state
+#    - Key performance indicators and headline metrics
+#    - High-level observations and critical insights
+ 
+# 2. TREND ANALYSIS
+#    - Identify monthly and quarterly revenue patterns and potential gaps
+#    - Highlight high-revenue months and low-revenue months
+#    - Analyze seasonality and trending patterns in the data
+#    - Make comparisons to previous years, months, and quarters by referencing past year monthly revenue totals in MONTHLY REVENUE TOTAL DATA section
+ 
+# 3. STRATEGIC RECOMMENDATIONS
+#    - Provide 3-5 actionable recommendations based on the monthly revenue patterns
+#    - Suggest optimization strategies for low-revenue periods
+#    - Make strategic recommendations based on current AI news and trends (reference any sources you find)
+#    - Make strategic recommendations based on news of TecAce clients Samsung and SK Telecom (reference any sources you find)
+#    - Recommend focus areas for improving overall revenue performance
+
+# 5. PROBABILITY OF ACHIEVING REVENUE GOALS
+#    - Based on current year project data and possibility % values, provide insights on projected performance
+#    - Identify potential risks to revenue targets
+#    - Suggest strategies to maximize revenue in upcoming months
+ 
+# 6. REVENUE FORECASTING
+#    - Based on current year data, provide insights on projected performance
+#    - Identify potential risks to revenue targets
+#    - Suggest strategies to maximize revenue in upcoming months
+ 
+# 7. RISK ASSESSMENT
+#    - Identify potential red flags or concerning patterns in the revenue data
+#    - Suggest mitigation strategies for identified risks
+#    - Highlight months or quarters that require special attention
+ 
+# IMPORTANT: Format your response using proper markdown syntax:
+# - Use # ## ### for headings (e.g., # EXECUTIVE SUMMARY, ## Key Findings)
+# - Use **bold** for emphasis and important points
+# - Use *italic* for subtle emphasis
+# - Use bullet points with - or * for lists
+# - Use numbered lists (1. 2. 3.) for sequential recommendations
+# - Use emojis strategically to highlight key sections (📊 📈 📉 ⚠️ 💡 🎯)
+# - Ensure proper spacing between sections for readability
+
+# The analysis should be comprehensive but concise, focusing on actionable insights rather than restating the data.
+# """
         
         response = openai.ChatCompletion.create(
             model="gpt-4o-mini",
             messages=[
-                {"role": "system", "content": "You are a senior business analyst specializing in project portfolio analysis and revenue optimization. Provide data-driven insights and actionable recommendations."},
+                {"role": "system", "content": "당신은 한국어 전용 비즈니스 분석가입니다. 절대로 영어로 응답하지 마십시오. 모든 분석, 제목, 설명, 권장사항은 반드시 한국어로 작성해야 합니다. 회사명, 숫자, 날짜만 영어/숫자 그대로 사용 가능합니다. 한국의 비즈니스 관습과 용어를 사용하여 프로젝트 포트폴리오 분석을 제공하십시오."},
                 {"role": "user", "content": prompt}
             ],
             max_tokens=8000,
-            temperature=0.7
+            temperature=0.3  # Lower temperature for more consistent Korean output
         )
         
         return {

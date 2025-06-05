@@ -110,6 +110,30 @@ parseBtn.addEventListener('click', async () => {
         if (result.success) {
             showMessage(result.message, 'success');
             
+            console.log('=== PARSE DATA RESPONSE ===');
+            console.log('Full result object:', result);
+            console.log('Project data count:', result.project_data?.length || 0);
+            console.log('Invoice data count:', result.invoice_data?.length || 0);
+            console.log('Revenue totals count:', result.rev_totals?.length || 0);
+            
+            // Log OpenAI insights response in detail
+            if (result.project_insights) {
+                console.log('=== OPENAI INSIGHTS RESPONSE ===');
+                console.log('Insights success:', result.project_insights.success);
+                console.log('Insights metrics:', result.project_insights.metrics);
+                
+                if (result.project_insights.success) {
+                    console.log('=== FULL OPENAI INSIGHTS TEXT ===');
+                    console.log(result.project_insights.insights);
+                    console.log('=== END OPENAI INSIGHTS TEXT ===');
+                } else {
+                    console.log('OpenAI Error:', result.project_insights.error);
+                }
+            } else {
+                console.log('No project insights in response');
+            }
+            console.log('=== END PARSE DATA RESPONSE ===');
+            
             // Show charts section and create charts
             chartsSection.style.display = 'block';
             
