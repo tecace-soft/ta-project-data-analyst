@@ -82,6 +82,50 @@
             <div class="spinner"></div>
             <p>Processing...</p>
         </div>
+        
+        <!-- Chat Window -->
+        <div class="chat-window" id="chat-window">
+            <div class="chat-header">
+                <h3>💬 Data Analysis Chat</h3>
+                <button class="chat-close-btn" id="chat-close-btn">×</button>
+            </div>
+            <div class="chat-messages" id="chat-messages">
+                <div class="chat-message system">
+                    <div class="message-content">
+                        <p>Hello! I'm your AI data analyst assistant. Ask me anything about your project data, revenue trends, or request specific analysis.</p>
+                        <p><strong>Example questions:</strong></p>
+                        <ul>
+                            <li>"What are the top performing projects?"</li>
+                            <li>"Analyze revenue trends by department"</li>
+                            <li>"Show me projects at risk"</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="chat-input-container">
+                <div class="chat-input-wrapper">
+                    <textarea 
+                        class="chat-input" 
+                        id="chat-input" 
+                        placeholder="Ask me anything about your data..."
+                        rows="1"
+                    ></textarea>
+                    <button class="chat-send-btn" id="chat-send-btn">
+                        <span>Send</span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M2 21L23 12L2 3V10L17 12L2 14V21Z" fill="currentColor"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Floating Chat Button -->
+        <button class="floating-chat-btn" id="floating-chat-btn">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M8 12H8.01M12 12H12.01M16 12H16.01M21 12C21 16.418 16.97 20 12 20C10.89 20 9.84 19.8 8.87 19.42L3 21L4.58 15.13C4.2 14.16 4 13.11 4 12C4 7.582 8.03 4 12 4C16.97 4 21 7.582 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </button>
     </div>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>

@@ -10,6 +10,7 @@ from datetime import datetime
 from collections import defaultdict
 import openai
 from dotenv import load_dotenv
+import requests
 
 # Load environment variables from .env file
 load_dotenv()
@@ -434,6 +435,97 @@ The analysis should be comprehensive but concise, focusing on actionable insight
                 'avg_revenue': 0
             }
         }
+
+@app.route('/chat', methods=['POST'])
+def chat_proxy():
+    """Proxy endpoint for chat requests to avoid CORS issues"""
+    try:
+        # Get the request data from frontend
+        chat_data = request.get_json()
+        
+        if not chat_data:
+            return jsonify({'success': False, 'error': 'No data provided'}), 400
+        
+        # Validate required fields
+        if 'request' not in chat_data:
+            return jsonify({'success': False, 'error': 'Missing request field'}), 400
+        
+        print(f"Chat request received: {chat_data.get('request')}")
+        print(f"Session ID: {chat_data.get('sessionId')}")
+        print(f"Project data count: {len(chat_data.get('projectData', []))}")
+        print(f"Invoice data count: {len(chat_data.get('invoiceData', []))}")
+        
+        # Make request to n8n webhook
+        n8n_webhook_url = 'https://gdkim.app.n8n.cloud/webhook/67cb173e-b768-43f2-99cc-45aaf49fc108'
+        
+        response = requests.post(
+            n8n_webhook_url,
+            json=chat_data,
+            headers={'Content-Type': 'application/json'},
+            timeout=60  # Increased to 60 second timeout
+        )
+        
+        print(f"n8n response status: {response.status_code}")
+        
+        if response.status_code == 200:
+            # Parse the JSON response from n8n and extract the "output" field
+            try:
+                response_json = response.json()
+                print(f"Response type: {type(response_json)}")
+                print(f"Response content preview: {str(response_json)[:200]}...")
+                
+                # Handle different response formats
+                if isinstance(response_json, dict):
+                    # If it's a dictionary, try to get 'output' field
+                    output_text = response_json.get('output', response_json.get('response', response.text))
+                elif isinstance(response_json, list):
+                    # If it's a list, try to get the first item or convert to string
+                    if len(response_json) > 0 and isinstance(response_json[0], dict):
+                        output_text = response_json[0].get('output', response_json[0].get('response', str(response_json)))
+                    else:
+                        output_text = str(response_json)
+                else:
+                    # If it's something else, convert to string
+                    output_text = str(response_json)
+                
+                return jsonify({
+                    'success': True, 
+                    'response': output_text
+                })
+            except json.JSONDecodeError:
+                # Fallback to raw text if JSON parsing fails
+                print("JSON decode error, using raw response text")
+                return jsonify({
+                    'success': True, 
+                    'response': response.text
+                })
+        else:
+            print(f"n8n error: {response.status_code} - {response.text}")
+            return jsonify({
+                'success': False, 
+                'error': f'n8n webhook returned status {response.status_code}'
+            }), response.status_code
+            
+    except requests.exceptions.Timeout:
+        print("Request to n8n webhook timed out")
+        return jsonify({
+            'success': False, 
+            'error': 'Request timeout - the AI service is processing your request but it\'s taking longer than expected (60+ seconds). Please try a simpler question or try again later.'
+        }), 408
+        
+    except requests.exceptions.ConnectionError:
+        print("Connection error to n8n webhook")
+        return jsonify({
+            'success': False, 
+            'error': 'Connection error - unable to reach the AI service'
+        }), 503
+        
+    except Exception as e:
+        print(f"Unexpected error in chat proxy: {str(e)}")
+        return jsonify({
+            'success': False, 
+            'error': 'An unexpected error occurred'
+        }), 500
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000) 

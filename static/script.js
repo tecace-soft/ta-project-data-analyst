@@ -13,9 +13,28 @@ const yearSelector = document.getElementById('year-selector');
 const monthlyYearSelector = document.getElementById('monthly-year-selector');
 const quarterlyYearSelector = document.getElementById('quarterly-year-selector');
 
+// Chat elements
+const chatWindow = document.getElementById('chat-window');
+const chatCloseBtn = document.getElementById('chat-close-btn');
+const chatInput = document.getElementById('chat-input');
+const chatSendBtn = document.getElementById('chat-send-btn');
+const chatMessages = document.getElementById('chat-messages');
+const floatingChatBtn = document.getElementById('floating-chat-btn');
+
 // Global variable to store project data for chart updates
 let globalProjectData = [];
 let globalRevenueData = [];
+let globalInvoiceData = [];
+let chatSessionId = null;
+
+// Generate unique session ID for chat
+function generateSessionId() {
+    if (!chatSessionId) {
+        // Generate a UUID-like session ID
+        chatSessionId = 'chat_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    }
+    return chatSessionId;
+}
 
 // File input change event
 fileInput.addEventListener('change', handleFileSelect);
@@ -97,6 +116,7 @@ parseBtn.addEventListener('click', async () => {
             // Store data globally for chart updates
             globalProjectData = result.project_data;
             globalRevenueData = result.rev_totals;
+            globalInvoiceData = result.invoice_data;
             
             // Set default year to current year
             const currentYear = new Date().getFullYear().toString();
@@ -122,6 +142,11 @@ parseBtn.addEventListener('click', async () => {
             if (result.project_insights) {
                 displayProjectInsights(result.project_insights);
             }
+            
+            // Show chat window after all processing is complete
+            setTimeout(() => {
+                showChatWindow();
+            }, 500); // Small delay for better UX
             
         } else {
             showMessage(result.error || 'Parsing failed', 'error');
@@ -455,4 +480,189 @@ function displayProjectInsights(insightsData) {
         insightsSection.style.display = 'block';
         console.log('Failed to generate insights:', insightsData.error);
     }
-} 
+}
+
+// Chat functionality
+function showChatWindow() {
+    // Generate session ID if not already created
+    generateSessionId();
+    
+    chatWindow.classList.add('show');
+    floatingChatBtn.classList.remove('show');
+}
+
+function hideChatWindow() {
+    chatWindow.classList.remove('show');
+    floatingChatBtn.classList.add('show');
+}
+
+function showFloatingChatButton() {
+    floatingChatBtn.classList.add('show');
+}
+
+function addChatMessage(content, type = 'assistant') {
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `chat-message ${type}`;
+    
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'message-content';
+    
+    if (type === 'assistant') {
+        // Render markdown for assistant messages
+        if (typeof marked !== 'undefined') {
+            contentDiv.innerHTML = marked.parse(content);
+        } else {
+            // Fallback if marked.js isn't available - convert basic markdown manually
+            let processedContent = content
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')  // Bold
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')              // Italic
+                .replace(/`(.*?)`/g, '<code>$1</code>')            // Inline code
+                .replace(/\n/g, '<br>');                           // Line breaks
+            contentDiv.innerHTML = processedContent;
+        }
+    } else {
+        // Plain text for user messages
+        contentDiv.textContent = content;
+    }
+    
+    messageDiv.appendChild(contentDiv);
+    chatMessages.appendChild(messageDiv);
+    
+    // Scroll to bottom
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    
+    return messageDiv;
+}
+
+function showChatLoading() {
+    const loadingDiv = document.createElement('div');
+    loadingDiv.className = 'chat-loading';
+    loadingDiv.id = 'chat-loading';
+    
+    loadingDiv.innerHTML = `
+        <span>AI is thinking</span>
+        <div class="chat-loading-dots">
+            <div class="chat-loading-dot"></div>
+            <div class="chat-loading-dot"></div>
+            <div class="chat-loading-dot"></div>
+        </div>
+    `;
+    
+    chatMessages.appendChild(loadingDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    
+    return loadingDiv;
+}
+
+function hideChatLoading() {
+    const loadingDiv = document.getElementById('chat-loading');
+    if (loadingDiv) {
+        loadingDiv.remove();
+    }
+}
+
+async function sendChatMessage() {
+    const message = chatInput.value.trim();
+    if (!message) return;
+    
+    // Disable input and button
+    chatInput.disabled = true;
+    chatSendBtn.disabled = true;
+    
+    // Add user message
+    addChatMessage(message, 'user');
+    
+    // Clear input
+    chatInput.value = '';
+    
+    // Show loading
+    const loadingDiv = showChatLoading();
+    
+    try {
+        // Prepare the request body
+        const requestBody = {
+            request: message,
+            projectData: globalProjectData || [],
+            invoiceData: globalInvoiceData || [],
+            sessionId: generateSessionId()
+        };
+        
+        console.log('Sending request to n8n webhook:', requestBody);
+        console.log('Session ID:', generateSessionId());
+        console.log('Project data count:', globalProjectData?.length || 0);
+        console.log('Invoice data count:', globalInvoiceData?.length || 0);
+        
+        // Make API call to n8n webhook
+        const response = await fetch('/chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(requestBody)
+        });
+        
+        console.log('Response status:', response.status);
+        
+        hideChatLoading();
+        
+        if (response.ok) {
+            // Get the JSON response
+            const responseData = await response.json();
+            console.log('Response data:', responseData);
+            
+            if (responseData.success) {
+                // Display the response in chat
+                addChatMessage(responseData.response, 'assistant');
+            } else {
+                // Handle application errors
+                addChatMessage(`Error: ${responseData.error}`, 'assistant');
+            }
+            
+        } else {
+            // Handle HTTP errors
+            const errorData = await response.json().catch(() => null);
+            const errorMessage = errorData?.error || `Request failed with status ${response.status}`;
+            console.error('API Error:', errorMessage);
+            addChatMessage(`Sorry, I encountered an error: ${errorMessage}`, 'assistant');
+        }
+        
+    } catch (error) {
+        hideChatLoading();
+        console.error('Detailed network error:', error);
+        console.error('Error name:', error.name);
+        console.error('Error message:', error.message);
+        
+        // More specific error messages
+        if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+            addChatMessage('Network error: Unable to reach the AI service. This might be a CORS issue or the service might be unavailable.', 'assistant');
+        } else {
+            addChatMessage('Sorry, I encountered a network error. Please check your connection and try again.', 'assistant');
+        }
+    }
+    
+    // Re-enable input and button
+    chatInput.disabled = false;
+    chatSendBtn.disabled = false;
+    chatInput.focus();
+}
+
+function autoResizeTextarea() {
+    chatInput.style.height = 'auto';
+    chatInput.style.height = Math.min(chatInput.scrollHeight, 100) + 'px';
+}
+
+// Chat event listeners
+chatCloseBtn.addEventListener('click', hideChatWindow);
+
+chatSendBtn.addEventListener('click', sendChatMessage);
+
+chatInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendChatMessage();
+    }
+});
+
+chatInput.addEventListener('input', autoResizeTextarea);
+
+floatingChatBtn.addEventListener('click', showChatWindow); 
