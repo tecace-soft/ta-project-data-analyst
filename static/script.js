@@ -253,7 +253,8 @@ function createMonthlyRevenueChart(revenueData, year) {
             size: 18,
             color: '#333'
         },
-        textangle: -90
+        textangle: -90,
+        hovertemplate: '<b>%{x}</b><br>Revenue: $%{y:,.0f}<extra></extra>'
     };
     
     const layout = {
@@ -264,7 +265,7 @@ function createMonthlyRevenueChart(revenueData, year) {
         xaxis: { title: 'Month' },
         yaxis: { 
             title: 'Revenue ($)',
-            tickformat: ',.0f'
+            tickformat: '.1s'
         },
         margin: { l: 80, r: 40, t: 120, b: 50 }
     };
@@ -299,7 +300,8 @@ function createQuarterlyRevenueChart(revenueData, year) {
         textfont: {
             size: 12,
             color: '#333'
-        }
+        },
+        hovertemplate: '<b>%{x}</b><br>Revenue: $%{y:,.0f}<extra></extra>'
     };
     
     const layout = {
@@ -310,7 +312,7 @@ function createQuarterlyRevenueChart(revenueData, year) {
         xaxis: { title: 'Quarter' },
         yaxis: { 
             title: 'Revenue ($)',
-            tickformat: ',.0f'
+            tickformat: '.1s'
         },
         margin: { l: 80, r: 40, t: 60, b: 50 }
     };
@@ -346,7 +348,8 @@ function createExpectedVsActualChart(revenueData, invoiceData) {
             size: 18,
             color: '#333'
         },
-        textangle: -90
+        textangle: -90,
+        hovertemplate: '<b>%{x}</b><br>Expected Revenue: $%{y:,.0f}<extra></extra>'
     };
     
     const trace2 = {
@@ -365,7 +368,8 @@ function createExpectedVsActualChart(revenueData, invoiceData) {
             size: 18,
             color: '#333'
         },
-        textangle: -90
+        textangle: -90,
+        hovertemplate: '<b>%{x}</b><br>Actual Invoices: $%{y:,.0f}<extra></extra>'
     };
     
     const layout = {
@@ -376,7 +380,7 @@ function createExpectedVsActualChart(revenueData, invoiceData) {
         xaxis: { title: 'Month' },
         yaxis: { 
             title: 'Revenue ($)',
-            tickformat: ',.0f'
+            tickformat: '.1s'
         },
         barmode: 'group',
         margin: { l: 80, r: 40, t: 150, b: 50 },
